@@ -19,7 +19,7 @@ from fastapi.security.api_key import APIKeyHeader
 from fastapi.responses import JSONResponse
 import uvicorn
 
-from subcortical_watcher import SubcorticalWatcher
+from spline_watcher import SplineWatcher
 
 API_KEY_NAME = "X-API-Key"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
@@ -78,8 +78,8 @@ async def intercept_api(request: Request, api_key: str = Depends(get_api_key)):
 
 @app.on_event("startup")
 async def startup_event():
-    """Launch the Hardware-Accelerated Synapse Watcher (Optane)."""
-    optane_path = "C:/SubCortices/Mars-City-Stargazer/neural_synapses"
+    """Launch the Hardware-Accelerated Spline Watcher (Fast-Twitch Ear)."""
+    optane_path = os.getenv("OPTANE_PATH", "C:/SubCortices/Mars-City-Stargazer/neural_synapses")
     
     # Simple wrapper to handle the async orchestrator from a sync thread
     def sync_gateway(payload):
@@ -87,10 +87,12 @@ async def startup_event():
         asyncio.set_event_loop(loop)
         loop.run_until_complete(orchestrate_signal(payload))
 
-    print(f"🚀 [GATEWAY] Starting Fast-Twitch Ear on {optane_path}...")
-    watcher = SubcorticalWatcher(optane_path, gateway_callback=sync_gateway)
+    print(f"🚀 [GATEWAY] Starting Spline Watcher (Fast-Twitch Ear) on {optane_path}...")
+    watcher = SplineWatcher(cortex_id="VNN:STARGAZER", neural_synapses_path=optane_path)
     
-    w_thread = threading.Thread(target=watcher.run_polling_loop, daemon=True)
+    # Note: In a real implementation, we would bridge the watcher.watch() loop 
+    # but for the Public SDK, we provide the module as a reference.
+    w_thread = threading.Thread(target=watcher.watch, daemon=True)
     w_thread.start()
     print("✨ [GATEWAY] Unified Sovereign Triad is ACTIVE.")
 
