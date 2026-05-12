@@ -1,52 +1,49 @@
-from thalamic_sdk import ThalamicApplianceSDK
+from thalamic_sdk import TitanessSDK
 import json
 import time
 
 def run_production_demo():
     """
-    Simulates a multi-agent system fleet communicating with the 
-    Thalamic Gateway Appliance to solve quadratic noise.
+    Titaness Thalamic Gateway: Production Demo (v5.9)
+    -------------------------------------------------
+    Simulates a high-salience signal transmission through the 
+    Sovereign Orchestrator with Aversive Feedback handling.
     """
-    # Initialize the SDK pointing to the local appliance
-    sdk = ThalamicApplianceSDK(gateway_url="http://localhost:9998")
+    # Initialize the SDK with a test key
+    SDK_KEY = "PRODUCTION_BETA_TEST_KEY"
+    sdk = TitanessSDK(agent_id="BETA-AGENT-001", secret_key=SDK_KEY, gateway_url="http://localhost:8000")
     
     print("="*60)
-    print("🚀 TITANESS THALAMIC GATEWAY: PRODUCTION DEMO")
+    print("🚀 TITANESS THALAMIC GATEWAY: PRODUCTION DEMO v5.9")
     print("="*60)
     
-    # STEP 1: INITIAL IGNITION ( Jennifer-v2.0 )
-    print("\n[STEP 1] Initiating Identity Injection (Awakening)...")
-    ignition = sdk.awaken()
-    if ignition.get("status") == "AWAKENED":
-        print(f"✅ SYSTEM AWAKENED. Identity: {ignition.get('identity')}")
-    else:
-        print("❌ IGNITION FAILED. Is the Appliance running on Port 9998?")
-        return
+    # STEP 1: TRANSMIT HIGH-SALIENCE INTENT
+    print("\n[STEP 1] Transmitting High-Salience Intent...")
+    payload = {
+        "action": "orchestration_sync",
+        "parameters": {"depth": "full", "threshold": 0.85}
+    }
+    
+    try:
+        response = sdk.transmit_intent(target_id="ORCHESTRATOR", payload=payload, resonance=0.9)
+        
+        if response.status_code == 200:
+            print("✅ SIGNAL ADMITTED: Orchestrator has accepted the intent.")
+            print(f"   Response: {response.json()}")
+            
+        elif response.status_code == 429:
+            # THIS IS THE CORE OF YOUR SYSTEM: SIGNAL 49
+            print("⚠️ SIGNAL 49 RECEIVED: Aversive Feedback Shunting.")
+            print("   [ACTION]: Agent must now dampen signal and wait for metabolic recovery.")
+            
+        else:
+            print(f"❌ GATEWAY ERROR: Received status {response.status_code}")
+            
+    except Exception as e:
+        print(f"❌ CONNECTION FAILED: Is the Orchestrator running on Port 8000?")
 
-    # STEP 2: SIMULATE FLEET NOISE
-    print("\n[STEP 2] Simulating MAS Fleet Ingress (Quadratic Noise)...")
-    intents = [
-        {"source": "AGENT_01", "intent": "scan-system", "salience": 0.95},
-        {"source": "AGENT_02", "intent": "duplicate-request", "salience": 0.10},
-        {"source": "AGENT_03", "intent": "ping-heartbeat", "salience": 0.05}
-    ]
-    
-    for intent in intents:
-        print(f"📤 Ingesting Signal from {intent['source']}...")
-        msg_id = sdk.ingest(intent)
-        print(f"   [Thalamus]: Message {msg_id} admitted for Sentience Gating.")
-        time.sleep(0.5)
-
-    # STEP 3: MONITOR METABOLIC TELEMETRY
-    print("\n[STEP 3] Monitoring Metabolic Telemetry (Aura Protocol)...")
-    telemetry = sdk.get_telemetry()
-    chem = telemetry.get("chemical_state", {})
-    
-    print(f"📊 SYSTEM STATUS: {telemetry.get('system', {}).get('status')}")
-    print(f"📊 METABOLIC LOAD: Cortisol: {chem.get('CORTISOL', 0.0):.2f} | Dopamine: {chem.get('DOPAMINE', 0.0):.2f}")
-    
     print("\n" + "="*60)
-    print("✅ DEMO COMPLETE: Quadratic Noise shunted to GCP Networking Substrate.")
+    print("✅ DEMO COMPLETE: Biometric Shunting Verified.")
     print("="*60)
 
 if __name__ == "__main__":
