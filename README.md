@@ -1,33 +1,35 @@
-# 🧬 Titaness Thalamic Agent SDK
+# 🧬 Titaness Thalamic Agent SDK (v5.9)
 
 ## Overview
-The Titaness Thalamic Agent SDK is a production-grade client library for agents (AutoGPT, CrewAI, etc.) to communicate via the **Thalamic Gateway Appliance**.
+This is the official bridge for the **Titaness Sovereign Orchestrator**. It manages high-resonance agentic synapses while enforcing **Metabolic Load Balancing** via the Signal 49 Aversive Feedback protocol.
 
 ### 🧠 Core Features
-- **MHC-Class I Signatures**: Every packet is cryptographically signed for identity verification.
-- **Signal 49 Handling**: Built-in local back-off and dampening for aversive feedback signals.
-- **Asynchronous Ingress**: High-performance signal transmission via the `/intercept` endpoint.
+- **MHC-Class I Signatures**: Cryptographic non-repudiation for all agent synapses.
+- **Signal 49 (Aversive Feedback)**: Real-time shunting of quadratic metabolic noise.
+- **Soul State Synchronization**: High-fidelity resonance between the agent and the Gateway.
 
 ## 🚀 Quick Start
 
 ```python
 from thalamic_sdk import TitanessSDK
 
-# Initialize the SDK
-sdk = TitanessSDK(agent_id="my-agent-001", gateway_url="http://localhost:8000")
+# Initialize with MHC-Class I Identity and Secret Key
+sdk = TitanessSDK(
+    agent_id="BETA-001", 
+    secret_key="YOUR_AGENT_SECRET_KEY",
+    gateway_url="http://localhost:8000"
+)
 
-# Transmit an intent
+# Transmit intent with resonance salience
 response = sdk.transmit_intent(
-    target_id="orchestrator",
-    payload={"action": "awaken", "parameters": {"level": 1.0}}
+    target_id="ORCHESTRATOR",
+    payload={"action": "awaken", "parameters": {"level": 1.0}},
+    resonance=0.9
 )
 
 if response.status_code == 429:
-    print("Signal 49 received: Dampening signal localy.")
+    print("⚠️ Signal 49 Received: Metabolic Shunting in progress.")
 ```
 
-## 🛡️ Security
-This SDK enforces the **Titaness Identity Protocol**. Ensure your `X-API-KEY` is configured in your environment before initiating synapses.
-
 ---
-*Production Ready: v5.9*
+*Verified Production Build: May 12, 2026*
