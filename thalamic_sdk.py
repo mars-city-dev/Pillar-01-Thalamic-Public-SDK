@@ -1,95 +1,106 @@
-import httpx
+import hmac
+import hashlib
 import json
-import uuid
+import time
+import httpx
 from typing import Dict, Any, Optional
 
-class ThalamicApplianceSDK:
+class ThalamicAgentSDK:
     """
-    Titaness Thalamic Appliance SDK (v4.0.0)
-    ========================================
-    Official bridge for the Standalone Software Appliance.
-    Solves the quadratic noise issue via TRN Gating and 
-    Metabolic Load Balancing.
+    Titaness Thalamic Agent SDK (v4.3.0)
+    ====================================
+    Client-side SDK for Agents (AutoGPT, CrewAI, etc.).
+    Enforces MHC-Class I Cryptographic Identity and Salience Gating.
     """
     
-    def __init__(self, gateway_url: str = "http://localhost:9998"):
+    def __init__(self, 
+                 gateway_url: str = "http://localhost:8000", 
+                 agent_id: str = "AGENT_01", 
+                 secret_key: str = "titaness_sovereign_2026"):
         """
-        Initialize the SDK.
-        
-        Args:
-            gateway_url: The URL of the Thalamic Appliance (Default: Port 9998)
+        Initialize the SDK with MHC-Class I Identity.
         """
         self.gateway_url = gateway_url.rstrip("/")
+        self.agent_id = agent_id
+        self.secret_key = secret_key
         self.client = httpx.Client(timeout=10.0)
 
-    def ingest(self, payload: Dict[str, Any]) -> str:
-        """
-        Ingest an intent into the Sentience Gating engine.
-        
-        Returns:
-            The message_id assigned by the Thalamus.
-        """
-        try:
-            response = self.client.post(f"{self.gateway_url}/ingest", json=payload)
-            if response.status_code in [200, 202]:
-                data = response.json()
-                return data.get("message_id")
-            else:
-                return f"ERROR: {response.status_code}"
-        except Exception as e:
-            return f"CONNECTION_ERROR: {e}"
+    def _sign_packet(self, payload: dict) -> str:
+        """Calculates the MHC-Class I HMAC-SHA256 signature."""
+        # Use sort_keys to ensure consistent JSON string representation for hashing
+        body_to_sign = json.dumps(payload, sort_keys=True)
+        return hmac.new(
+            self.secret_key.encode(),
+            body_to_sign.encode(),
+            hashlib.sha256
+        ).hexdigest()
 
-    def evaluate(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def transmit_intent(self, 
+                        target_id: str, 
+                        payload: Dict[str, Any], 
+                        resonance: float = 0.5, 
+                        urgency: float = 0.5) -> Dict[str, Any]:
         """
-        Directly evaluate a signal's salience without ingesting.
-        Returns the TRN Admittance decision.
+        Transmits a signal to another agent via the Thalamus.
+        Includes MHC Signing and Salience Metadata.
         """
+        # Construct the unified packet (Isomorphic Signaling Standard)
+        packet = {
+            "sender_id": self.agent_id,
+            "target_id": target_id,
+            "resonance": resonance,
+            "urgency": urgency,
+            "payload": payload
+        }
+        
+        # Calculate the MHC-Class I Signature
+        signature = self._sign_packet(packet)
+        
+        headers = {
+            "X-API-Key": "sk_live_enterprise_123",
+            "X-MHC-Signature": signature,
+            "Content-Type": "application/json"
+        }
+        
         try:
-            response = self.client.post(f"{self.gateway_url}/evaluate", json=payload)
-            return response.json()
+            # All traffic hits the /intercept endpoint for gating
+            response = self.client.post(f"{self.gateway_url}/intercept", json=packet, headers=headers)
+            
+            if response.status_code in [200, 202]:
+                return response.json()
+            elif response.status_code == 429:
+                msg = response.json().get("detail", "Please Upgrade your License.")
+                return {
+                    "status": "METABOLIC_SATURATION", 
+                    "code": 429, 
+                    "message": msg,
+                    "action": "BACKOFF_REQUIRED"
+                }
+            else:
+                return {"status": "ERROR", "code": response.status_code, "detail": response.text}
+                
         except Exception as e:
-            return {"admitted": False, "reason": f"SDK_ERROR: {e}"}
+            return {"status": "ERROR", "detail": f"CONNECTION_ERROR: {e}"}
 
     def get_telemetry(self) -> Dict[str, Any]:
-        """
-        Fetch the current metabolic state (Cortisol/Dopamine) 
-        and traffic engams.
-        """
+        """Fetch the current metabolic state from the Gateway."""
         try:
             response = self.client.get(f"{self.gateway_url}/telemetry")
             return response.json()
         except Exception as e:
             return {"error": str(e)}
 
-    def awaken(self) -> Dict[str, Any]:
-        """
-        Trigger the Identity Injection Sequence (Jennifer-v2.0).
-        Transitions the appliance from COMA_STATE to LIVING.
-        """
-        try:
-            response = self.client.post(f"{self.gateway_url}/awaken")
-            return response.json()
-        except Exception as e:
-            return {"status": "FAILED", "error": str(e)}
+# Alias for backward compatibility
+ThalamicApplianceSDK = ThalamicAgentSDK
 
 if __name__ == "__main__":
-    # --- REAL TEST SEQUENCE FOR THE APPLIANCE ---
-    sdk = ThalamicApplianceSDK()
+    # --- INTERNAL SDK TEST SEQUENCE ---
+    sdk = ThalamicAgentSDK()
+    print("--- 🧠 TITANESS: AGENT SDK v4.3.0 LIVE ---")
     
-    print("--- 🧠 TITANESS: APPLIANCE SDK TEST ---")
-    
-    # 1. Awaken the system
-    print("[1/3] Triggering Awakening Sequence...")
-    wake_res = sdk.awaken()
-    print(f"      Status: {wake_res.get('status')} | Identity: {wake_res.get('identity')}")
-    
-    # 2. Ingest a signal (Quadratic Noise Shunting)
-    print("\n[2/3] Ingesting intent for Sentience Gating...")
-    msg_id = sdk.ingest({"action": "re-index-all", "source": "MAS_FLEET_NODE_01"})
-    print(f"      Message ID: {msg_id}")
-    
-    # 3. Check Telemetry (Hormonal levels)
-    print("\n[3/3] Fetching Metabolic Telemetry...")
-    telemetry = sdk.get_telemetry()
-    print(f"      System Status: {telemetry.get('system', {}).get('status')}")
-    print(f"      Chemical State: {json.dumps(telemetry.get('chemical_state'), indent=2)}")
+    res = sdk.transmit_intent(
+        target_id="CORTEX_01",
+        payload={"task": "heartbeat-test"},
+        resonance=1.0
+    )
+    print(f"      Result: {json.dumps(res, indent=2)}")
